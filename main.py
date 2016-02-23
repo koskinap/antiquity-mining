@@ -16,10 +16,13 @@ def main():
 
 class MyHTMLParser(HTMLParser):
 	    def handle_data(self, data):
-	    	data.strip()
-	    	if data != '':
-       			print "Encountered some data  :", data
+	    	data = data.strip()
+       		print "Encountered some word  :", data
 
+	    def handle_starttag(self, tag, attrs):
+	        print "Encountered a start tag:", tag
+	    def handle_endtag(self, tag):
+	        print "Encountered an end tag :", tag
 
 if __name__ == "__main__":
 	main()
