@@ -1,5 +1,6 @@
 # Ignored directories
 /gap-html 
+/docs
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

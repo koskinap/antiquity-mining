@@ -7,7 +7,9 @@ from HTMLParser import HTMLParser
 PUNCT = string.punctuation
 
 #Sample input dir,needs to be generalized to take all files in every directory and produce a final document
-inputDir = "./gap-html/gap_-C0BAAAAQAAJ/00000142.html"
+sourceDir = './gap-html'
+outputdir = './docs/'
+sampleInputDir = "./gap-html/gap_-C0BAAAAQAAJ/00000142.html"
 
 class MyHTMLParser(HTMLParser):
 	# initialize a text list which holds all the words in 
@@ -15,24 +17,16 @@ class MyHTMLParser(HTMLParser):
 		HTMLParser.__init__(self)
 		self.__text = []
 
-	# handle the dta,clean chars,punctuation
+	# handle the data
 	def handle_data(self, data):
 		# punctuation may not need to be removed, at this stage we want to clean text from html to pure text
 		# data = data.replace(PUNCT, ' ')
+		# convertion to lowercase can be done
 		data = data.strip()
-
-		dataSplit = data.split(' ')
 		for w in dataSplit:
 			word = w.strip()
 			if word != '':
-				self.__text.append(word+ ' ')
-
-		# #Alternative
-		# text = data.strip()
-		# if len(text) > 0:
-		# 	text = re.sub('[ \t\r\n]+', ' ', text)
-		# 	self.__text.append(text + ' ')
-
+				self.__text.append(word + ' ')
 
 	#If faced a html tag which signs change of line,then add newline char
 	def handle_starttag(self, tag, attrs):
@@ -40,18 +34,29 @@ class MyHTMLParser(HTMLParser):
 			self.__text.append('\n')
 	# join all words in text list in a string to produce the final text
 	def text(self):
-		print ''.join(self.__text)
+		return ''.join(self.__text)
 
-	# def handle_endtag(self, tag):
-	# 	print "Encountered an end tag :", tag
+
 
 def main():
-	parser = MyHTMLParser()
-	with open(inputDir, 'r') as inputFile:
-		fullDoc = inputFile.read()
-		parser.feed(fullDoc)
-		parser.close()
-		parser.text()
+	dirs = os.listdir( sourceDir )
+	for d in dirs:
+		print("Processing book" + d)
+		output = ''
+		# here set the output direction and output file
+		# returns a list of all html files in a directory composing a book
+		filesList = os.listdir(sourceDir + '/' + d)
+		# For everyfile run htmlparser and append and output which is written in a file = book/document
+		for f in filesList:
+			parser = MyHTMLParser()
+			with open(sourceDir + '/'+ d + '/' + f, 'r') as inputFile:
+				fullDoc = inputFile.read()
+				parser.feed(fullDoc)
+				parser.close()
+				# print type(parser.text()
+				output = output + '\n\n' + str(parser.text())
+		with open(outputdir + d + '.txt' ,'w') as outputFilename:
+			outputFilename.write(output)
 
 if __name__ == "__main__":
 	main()
