@@ -8,8 +8,11 @@ PUNCT = string.punctuation
 
 #Sample input dir,needs to be generalized to take all files in every directory and produce a final document
 sourceDir = './gap-html'
-outputdir = './docs/'
+outputDir = './docs/'
 sampleInputDir = "./gap-html/gap_-C0BAAAAQAAJ/00000142.html"
+
+def is_ascii(s):
+    return all(ord(c) < 128 for c in s)
 
 class MyHTMLParser(HTMLParser):
 	# initialize a text list which holds all the words in 
@@ -23,10 +26,14 @@ class MyHTMLParser(HTMLParser):
 		# data = data.replace(PUNCT, ' ')
 		# convertion to lowercase can be done
 		data = data.strip()
-		for w in dataSplit:
-			word = w.strip()
-			if word != '':
-				self.__text.append(word + ' ')
+		if (data == 'OCR Output' or is_ascii(data) == False):
+			pass
+		else:
+			dataSplit = data.split(' ')
+			for w in dataSplit:
+				word = w.strip()
+				if word != '':
+					self.__text.append(word + ' ')
 
 	#If faced a html tag which signs change of line,then add newline char
 	def handle_starttag(self, tag, attrs):
@@ -55,7 +62,7 @@ def main():
 				parser.close()
 				# print type(parser.text()
 				output = output + '\n\n' + str(parser.text())
-		with open(outputdir + d + '.txt' ,'w') as outputFilename:
+		with open(outputDir + d + '.txt' ,'w') as outputFilename:
 			outputFilename.write(output)
 
 if __name__ == "__main__":
