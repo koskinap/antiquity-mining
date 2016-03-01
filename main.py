@@ -4,6 +4,10 @@ import re
 import string
 from HTMLParser import HTMLParser
 
+
+# http://stackoverflow.com/questions/328356/extracting-text-from-html-file-using-python
+
+
 PUNCT = string.punctuation
 
 #Sample input dir,needs to be generalized to take all files in every directory and produce a final document
