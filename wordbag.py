@@ -3,60 +3,78 @@ import os
 import re
 import string
 import operator
+import json
+import simplejson
 from nltk.corpus import stopwords
 import matplotlib.pyplot as plt
+from nltk.stem.snowball import SnowballStemmer
 
 cachedStopWords = stopwords.words("english")
-
+stemmer = SnowballStemmer("english")
 PUNCT = string.punctuation
 
-#sourceDir = './docs'
-sourceDir = './docs/gap_-C0BAAAAQAAJ.txt'
-#outputDir = ''
+sourceDir = './docs'
+outputDir = './wordvectors/'
 
-
-def plotOccurences(wordOccurences):
-	occurList = []
-	for x in wordOccurences:
-		occurList.append(x[1])
-
-	occurList.sort(reverse = True)
-
-	plt.plot(occurList)
-	plt.ylabel('some numbers')
-	plt.xlabel('words')
-	plt.show()
-
-with open(sourceDir, 'r') as inputFile:
-	text = inputFile.read()
-	
-	# Substitute everything that is not a word/number with a space and then split
+def makeBagOfWords(text):
+		# Substitute everything that is not a word/number with a space and then split
+	# Create a bag of words seperated by spaces and make a list of words
 	wordBag = re.sub('[^A-Za-z0-9]+', ' ', text)
 	wordBagList = wordBag.split(' ')
 
-	# make a dictionary which counts the appearances of each word
+	#Stemming here!!!
+	stemmedWordBagList = []
+	stemmedWordBagList = [stemmer.stem(token) for token in wordBagList]
+
+	# Make a dictionary which counts the appearances of each word
 	wordDict = {}
-	for word in wordBagList:
+
+	for word in stemmedWordBagList:
+		# Convert current word to lower case
 		testword = word.lower()
+
+		# Check if word exists in dictionary to count occurences of each
 		if (testword in wordDict):
 			wordDict[testword] += 1
 		elif ((testword in cachedStopWords) or (len(testword) < 3)):
+			# Ignore toos short words and stopwords
 			pass
 		else:
 			wordDict[testword] = 1
 
-	# Sort the Dictionary in sorted tuple(dictionaries cannot be sorted)
-	wordDictSorted = sorted(wordDict.items(), key = operator.itemgetter(1))
-	# print wordDictSorted
+	return wordDict
 
-#print type(wordDictSorted)
 
-ml = sorted(wordDictSorted, key = operator.itemgetter(1), reverse = True)
+def main():
+	dirs = os.listdir( sourceDir )
+	for d in dirs:
+		fileName = sourceDir + '/' + d 
+		if (fileName.endswith(".txt")):
+			print("Processing book : " + d)
+			with open(fileName, 'r') as inputFile:
+				text = inputFile.read()			
+				wordVector = makeBagOfWords(text)
+			
+			written_paths = d.split('.')
+			d_name_without_extension = written_paths[0]
+			
+			f = os.path.join(outputDir, d_name_without_extension) + '.json'
+			with open(f, 'w+') as out_file:
+				json.dump(wordVector, out_file,indent = 4)
 
-for i,x in enumerate(ml):
-	if i>100:
-		break
-	else:
-		print ml[i]
 
-plotOccurences(wordDictSorted)
+			# Sorted approach
+			# wordDictSorted = sorted(wordVector.items(), key = operator.itemgetter(1))
+			# Sort by term frequency
+			# wordVector = sorted(countedTokenTuple, key = operator.itemgetter(1), reverse = True)
+
+			# printOccurTuples(wordVector)
+			# Print plot of sorted distribution 
+			# plotOccurences(wordDictSorted,d)
+
+
+
+
+if __name__ == "__main__":
+	main()
+

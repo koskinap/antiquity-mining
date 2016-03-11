@@ -4,16 +4,17 @@ import re
 import string
 from HTMLParser import HTMLParser
 
-
+# Original MyHtmlParser classs taken and modified by
 # http://stackoverflow.com/questions/328356/extracting-text-from-html-file-using-python
 
 
 PUNCT = string.punctuation
 
 #Sample input dir,needs to be generalized to take all files in every directory and produce a final document
+#sampleInputDir = "./gap-html/gap_-C0BAAAAQAAJ/00000142.html"
+
 sourceDir = './gap-html'
 outputDir = './docs/'
-sampleInputDir = "./gap-html/gap_-C0BAAAAQAAJ/00000142.html"
 
 def is_ascii(s):
     return all(ord(c) < 128 for c in s)
@@ -33,6 +34,7 @@ class MyHTMLParser(HTMLParser):
 		if (data == 'OCR Output' or is_ascii(data) == False):
 			pass
 		else:
+			#check if needed
 			dataSplit = data.split(' ')
 			for w in dataSplit:
 				word = w.strip()
@@ -52,7 +54,7 @@ class MyHTMLParser(HTMLParser):
 def main():
 	dirs = os.listdir( sourceDir )
 	for d in dirs:
-		print("Processing book" + d)
+		print("Processing book : " + d)
 		output = ''
 		# here set the output direction and output file
 		# returns a list of all html files in a directory composing a book
