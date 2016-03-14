@@ -2,6 +2,7 @@
 /gap-html 
 /docs
 /wordvectors
+/analysisData
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

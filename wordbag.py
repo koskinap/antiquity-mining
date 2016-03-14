@@ -17,12 +17,12 @@ sourceDir = './docs'
 outputDir = './wordvectors/'
 
 def makeBagOfWords(text):
-		# Substitute everything that is not a word/number with a space and then split
+	# Substitute everything that is not a word/number with a space and then split
 	# Create a bag of words seperated by spaces and make a list of words
 	wordBag = re.sub('[^A-Za-z0-9]+', ' ', text)
 	wordBagList = wordBag.split(' ')
 
-	#Stemming here!!!
+	#Stemming
 	stemmedWordBagList = []
 	stemmedWordBagList = [stemmer.stem(token) for token in wordBagList]
 
@@ -61,18 +61,6 @@ def main():
 			f = os.path.join(outputDir, d_name_without_extension) + '.json'
 			with open(f, 'w+') as out_file:
 				json.dump(wordVector, out_file,indent = 4)
-
-
-			# Sorted approach
-			# wordDictSorted = sorted(wordVector.items(), key = operator.itemgetter(1))
-			# Sort by term frequency
-			# wordVector = sorted(countedTokenTuple, key = operator.itemgetter(1), reverse = True)
-
-			# printOccurTuples(wordVector)
-			# Print plot of sorted distribution 
-			# plotOccurences(wordDictSorted,d)
-
-
 
 
 if __name__ == "__main__":

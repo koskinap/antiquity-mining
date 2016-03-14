@@ -11,7 +11,6 @@ from HTMLParser import HTMLParser
 PUNCT = string.punctuation
 
 #Sample input dir,needs to be generalized to take all files in every directory and produce a final document
-#sampleInputDir = "./gap-html/gap_-C0BAAAAQAAJ/00000142.html"
 
 sourceDir = './gap-html'
 outputDir = './docs/'
@@ -28,8 +27,7 @@ class MyHTMLParser(HTMLParser):
 	# handle the data
 	def handle_data(self, data):
 		# punctuation may not need to be removed, at this stage we want to clean text from html to pure text
-		# data = data.replace(PUNCT, ' ')
-		# convertion to lowercase can be done
+
 		data = data.strip()
 		if (data == 'OCR Output' or is_ascii(data) == False):
 			pass
@@ -66,7 +64,7 @@ def main():
 				fullDoc = inputFile.read()
 				parser.feed(fullDoc)
 				parser.close()
-				# print type(parser.text()
+
 				output = output + '\n\n' + str(parser.text())
 		with open(outputDir + d + '.txt' ,'w') as outputFilename:
 			outputFilename.write(output)
