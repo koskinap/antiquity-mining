@@ -15,10 +15,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 stemmer = SnowballStemmer("english")
 
+destFileTfIdf = './matrices/tfidf_matrix.txt'
 sourceDir = './docs/'
-documentDir = './docs/DICTIONARY GREEK AND ROMAN GEOGRAPHY VOL II.txt'
-# documentDir = './docs/HISTORY OF THE DECLINE AND FALL OF THE ROMAN EMPIRE GIBBONs VOL II.txt'
-wordListDir = './analysisData/wordList.txt'
 
 def preprocessing(text):
 	# first tokenize by sentence, then by word to ensure that punctuation is caught as it's own token
@@ -61,11 +59,13 @@ def main():
 	tfidf_matrix = tfidf_vectorizer.fit_transform(rawDoc) #fit the vectorizer to synopses
 
 	print(tfidf_matrix.shape)
-	dist = 1 - cosine_similarity(tfidf_matrix)
-	print dist
+	# dist = 1 - cosine_similarity(tfidf_matrix)
+	# print dist
 	# print(tfidf_vectorizer.get_feature_names())
 
 
+	with open(destFileTfIdf, 'wb+') as f:
+		pickle.dump(tfidf_matrix ,f) 
 
 	# dirs = os.listdir( sourceDir )
 	# for d in dirs:
