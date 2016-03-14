@@ -3,9 +3,6 @@ import os
 import re
 import string
 import operator
-import json
-import simplejson
-import pprint
 import pandas as pd
 import matplotlib.pyplot as plt
 import pickle
@@ -13,13 +10,14 @@ import nltk
 from nltk.stem.snowball import SnowballStemmer
 from sklearn import feature_extraction
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 stemmer = SnowballStemmer("english")
 
-sourceDir = './wordvectors'
-# documentDir = './docs/DICTIONARY GREEK AND ROMAN GEOGRAPHY VOL II.txt'
-documentDir = './docs/HISTORY OF THE DECLINE AND FALL OF THE ROMAN EMPIRE GIBBONs VOL II.txt'
+sourceDir = './docs/'
+documentDir = './docs/DICTIONARY GREEK AND ROMAN GEOGRAPHY VOL II.txt'
+# documentDir = './docs/HISTORY OF THE DECLINE AND FALL OF THE ROMAN EMPIRE GIBBONs VOL II.txt'
 wordListDir = './analysisData/wordList.txt'
 
 def preprocessing(text):
@@ -28,9 +26,11 @@ def preprocessing(text):
 	filtered_tokens = []
 	# filter out any tokens not containing letters (e.g., numeric tokens, raw punctuation)
 	for token in tokens:
-		testToken = token.lower()
-		if (re.search('[a-zA-Z0-9]', testToken) and all(ord(c) < 128 for c in testToken) and len(testToken)>2):
-			filtered_tokens.append(testToken)
+		subbedToken = re.sub('[^A-Za-z0-9]+', ' ', token)
+		testToken = subbedToken.lower().split()
+		for w in testToken:
+			if (re.search('[a-zA-Z0-9]', w) and all(ord(c) < 128 for c in w) and len(w)>2):
+				filtered_tokens.append(w)
 	stems = [stemmer.stem(t) for t in filtered_tokens]
 	return stems
 
@@ -40,9 +40,19 @@ def main():
 	# with open(wordListDir, 'rb') as f:
 	# 	wordList = pickle.load(f)
 
+	# rawDoc = []
+	# with open(documentDir, 'rb') as f2:
+	# 	rawDoc.append(f2.read())
+
 	rawDoc = []
-	with open(documentDir, 'rb') as f2:
-		rawDoc.append(f2.read())
+	docTitles = []
+	dirs = os.listdir( sourceDir )
+	for d in dirs:
+		fileName = sourceDir + d 
+		if (fileName.endswith(".txt")):
+			with open(fileName, 'rb') as f:
+				rawDoc.append(f.read())
+				docTitles.append(d)
 
 
 
@@ -51,9 +61,11 @@ def main():
 	tfidf_matrix = tfidf_vectorizer.fit_transform(rawDoc) #fit the vectorizer to synopses
 
 	print(tfidf_matrix.shape)
+	dist = 1 - cosine_similarity(tfidf_matrix)
+	print dist
 	# print(tfidf_vectorizer.get_feature_names())
 
-	# print(tfidf_matrix.features)
+
 
 	# dirs = os.listdir( sourceDir )
 	# for d in dirs:
