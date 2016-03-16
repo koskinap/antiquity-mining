@@ -51,6 +51,9 @@ class MyHTMLParser(HTMLParser):
 
 def main():
 	dirs = os.listdir( sourceDir )
+	dirs.remove('.DS_Store')
+	# print dirs
+	# exit()
 	for d in dirs:
 		print("Processing book : " + d)
 		output = ''
@@ -60,12 +63,14 @@ def main():
 		# For everyfile run htmlparser and append and output which is written in a file = book/document
 		for f in filesList:
 			parser = MyHTMLParser()
-			with open(sourceDir + '/'+ d + '/' + f, 'r') as inputFile:
+			fileName = sourceDir + '/'+ d + '/' + f
+			with open(fileName, 'r') as inputFile:
 				fullDoc = inputFile.read()
 				parser.feed(fullDoc)
 				parser.close()
 
-				output = output + '\n\n' + str(parser.text())
+			output = output + '\n\n' + str(parser.text())
+			# print output
 		with open(outputDir + d + '.txt' ,'w') as outputFilename:
 			outputFilename.write(output)
 

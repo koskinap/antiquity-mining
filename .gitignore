@@ -4,6 +4,8 @@
 /wordvectors
 /analysisData
 /matrices
+/docs2
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

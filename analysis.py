@@ -16,7 +16,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 stemmer = SnowballStemmer("english")
 
 destFileTfIdf = './matrices/tfidf_matrix.txt'
-sourceDir = './docs/'
+featureNamesFile = './matrices/featurenames.txt'
+titlesFile = './matrices/titles.txt'
+# sourceDir = './docs/'
+sourceDir = './docs2/'
 
 def preprocessing(text):
 	# first tokenize by sentence, then by word to ensure that punctuation is caught as it's own token
@@ -35,49 +38,39 @@ def preprocessing(text):
 
 def main():
 
-	# with open(wordListDir, 'rb') as f:
-	# 	wordList = pickle.load(f)
-
-	# rawDoc = []
-	# with open(documentDir, 'rb') as f2:
-	# 	rawDoc.append(f2.read())
-
+	# Initialize lists with full texts of every book/document
 	rawDoc = []
+	# Initialize list storing titles
 	docTitles = []
+
 	dirs = os.listdir( sourceDir )
+	dirs.remove('.DS_Store.txt')
+	dirs.remove('.DS_Store')
+	
 	for d in dirs:
 		fileName = sourceDir + d 
 		if (fileName.endswith(".txt")):
 			with open(fileName, 'rb') as f:
 				rawDoc.append(f.read())
-				docTitles.append(d)
+				docTitles.append(re.sub('\.txt$', '', d))
 
-
-
-	tfidf_vectorizer = TfidfVectorizer(stop_words='english',tokenizer=preprocessing, use_idf=True, ngram_range=(1,1))
+	# Initialize an object of a class which performs transform on text later
+	tfidf_vectorizer = TfidfVectorizer(max_df=065, max_features=200000,
+                                 min_df=0.1, stop_words='english',tokenizer=preprocessing, use_idf=True, ngram_range=(1,1))
 	
-	tfidf_matrix = tfidf_vectorizer.fit_transform(rawDoc) #fit the vectorizer to synopses
+	tfidf_matrix = tfidf_vectorizer.fit_transform(rawDoc)
+	featureNames = tfidf_vectorizer.get_feature_names()
 
-	print(tfidf_matrix.shape)
-	# dist = 1 - cosine_similarity(tfidf_matrix)
-	# print dist
-	# print(tfidf_vectorizer.get_feature_names())
-
-
+	# Store tf_idf matrix, feature names and book titles in files so they can be used again later without 
+	# needing the costful process of computing the tfidf matrix again
 	with open(destFileTfIdf, 'wb+') as f:
 		pickle.dump(tfidf_matrix ,f) 
 
-	# dirs = os.listdir( sourceDir )
-	# for d in dirs:
-	# 	fileName = sourceDir + '/' + d 
-	# 	if (fileName.endswith(".json")):
-	# 		with open(fileName, 'r') as inputFile:
-	# 			print("Processing book : " + d)
-	# 			content = json.load(inputFile)
-	# 			#print type(content)
+	with open(featureNamesFile, 'wb+') as f2:
+		pickle.dump(featureNames ,f2)
 
-	# 		wordDictSorted = sorted(content.items(), key = operator.itemgetter(1), reverse = True)
-	# 		print(len(wordDictSorted))
+	with open(titlesFile, 'wb+') as f3:
+		pickle.dump(docTitles ,f3) 
 
 
 
