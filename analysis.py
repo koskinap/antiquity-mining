@@ -21,6 +21,7 @@ destFileTfIdf = './matrices/tfidf_matrix.txt'
 featureNamesFile = './matrices/featurenames.txt'
 titlesFile = './matrices/titles.txt'
 sourceDir = './docs2/'
+rawDocFile = './matrices/rawDoc.txt'
 # sourceDir = './docs/'
 
 
@@ -33,7 +34,7 @@ def preprocessing(text):
 		# testToken = token
 		testToken = token.lower().split()
 		for w in testToken:
-			if (re.search('[a-zA-Z]', w) and all(ord(c) < 128 for c in w)):
+			if (re.search('[a-zA-Z^0-9]', w)):
 				filtered_tokens.append(w)
 	stems = [stemmer.stem(t) for t in filtered_tokens]
 	return stems
@@ -73,7 +74,10 @@ def main():
 		pickle.dump(featureNames ,f2)
 
 	with open(titlesFile, 'wb+') as f3:
-		pickle.dump(docTitles ,f3) 
+		pickle.dump(docTitles ,f3)
+
+	with open(rawDocFile, 'wb+') as f4:
+		pickle.dump(rawDoc ,f4)
 
 
 
