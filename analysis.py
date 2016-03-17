@@ -12,25 +12,28 @@ from sklearn import feature_extraction
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+# Tf_Idf implementation taken on 14/03/2016 and adjusted
+# http://brandonrose.org/clustering#Visualizing-document-clusters 
 
 stemmer = SnowballStemmer("english")
 
 destFileTfIdf = './matrices/tfidf_matrix.txt'
 featureNamesFile = './matrices/featurenames.txt'
 titlesFile = './matrices/titles.txt'
-# sourceDir = './docs/'
 sourceDir = './docs2/'
+# sourceDir = './docs/'
+
 
 def preprocessing(text):
-	# first tokenize by sentence, then by word to ensure that punctuation is caught as it's own token
-	tokens = [word for sent in nltk.sent_tokenize(text) for word in nltk.word_tokenize(sent)]
+	# tokenize bag of words
+	tokens = [word for word in nltk.word_tokenize(text)]
 	filtered_tokens = []
 	# filter out any tokens not containing letters (e.g., numeric tokens, raw punctuation)
 	for token in tokens:
-		subbedToken = re.sub('[^A-Za-z0-9]+', ' ', token)
-		testToken = subbedToken.lower().split()
+		# testToken = token
+		testToken = token.lower().split()
 		for w in testToken:
-			if (re.search('[a-zA-Z0-9]', w) and all(ord(c) < 128 for c in w) and len(w)>2):
+			if (re.search('[a-zA-Z]', w) and all(ord(c) < 128 for c in w)):
 				filtered_tokens.append(w)
 	stems = [stemmer.stem(t) for t in filtered_tokens]
 	return stems
@@ -46,7 +49,7 @@ def main():
 	dirs = os.listdir( sourceDir )
 	dirs.remove('.DS_Store.txt')
 	dirs.remove('.DS_Store')
-	
+
 	for d in dirs:
 		fileName = sourceDir + d 
 		if (fileName.endswith(".txt")):
@@ -55,8 +58,8 @@ def main():
 				docTitles.append(re.sub('\.txt$', '', d))
 
 	# Initialize an object of a class which performs transform on text later
-	tfidf_vectorizer = TfidfVectorizer(max_df=065, max_features=200000,
-                                 min_df=0.1, stop_words='english',tokenizer=preprocessing, use_idf=True, ngram_range=(1,1))
+	tfidf_vectorizer = TfidfVectorizer(max_df=0.80, max_features=50000,
+                                 min_df=0.20, stop_words='english',tokenizer=preprocessing, use_idf=True, ngram_range=(1,1))
 	
 	tfidf_matrix = tfidf_vectorizer.fit_transform(rawDoc)
 	featureNames = tfidf_vectorizer.get_feature_names()

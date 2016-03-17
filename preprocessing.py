@@ -4,13 +4,11 @@ import re
 import string
 from HTMLParser import HTMLParser
 
-# Original MyHtmlParser classs taken and modified by
+# Original MyHtmlParser class taken on 24/02/2016 and modified 
 # http://stackoverflow.com/questions/328356/extracting-text-from-html-file-using-python
 
 
 PUNCT = string.punctuation
-
-#Sample input dir,needs to be generalized to take all files in every directory and produce a final document
 
 sourceDir = './gap-html'
 outputDir = './docs/'
@@ -39,7 +37,7 @@ class MyHTMLParser(HTMLParser):
 				if word != '':
 					self.__text.append(word + ' ')
 
-	#If faced a html tag which signs change of line,then add newline char
+	# If faced a html tag which signs change of line,then add newline char
 	def handle_starttag(self, tag, attrs):
 		if tag in ['p', 'br']:
 			self.__text.append('\n')
@@ -52,8 +50,7 @@ class MyHTMLParser(HTMLParser):
 def main():
 	dirs = os.listdir( sourceDir )
 	dirs.remove('.DS_Store')
-	# print dirs
-	# exit()
+
 	for d in dirs:
 		print("Processing book : " + d)
 		output = ''
@@ -69,7 +66,7 @@ def main():
 				parser.feed(fullDoc)
 				parser.close()
 
-			output = output + '\n\n' + str(parser.text())
+			output = output + '\n' + str(parser.text())
 			# print output
 		with open(outputDir + d + '.txt' ,'w') as outputFilename:
 			outputFilename.write(output)

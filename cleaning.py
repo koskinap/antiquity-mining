@@ -14,19 +14,19 @@ outputDir = './docs2/'
 def clean(text):
 
 	# substitute every character that is no letter with a space
-	letters_only = re.sub("[^a-zA-Z]", " ", text) 
+	removed_nonalphanumerical = re.sub("[^a-zA-Z0-9]", " ", text) 
 
-	# convert every word to lower case
-	words = letters_only.lower().split()                             
+	# convert every word to lower case and split by space to have a bag of words
+	words = removed_nonalphanumerical.lower().split()                             
 
 	# Store all stopwords in a set
 	stops = set(stopwords.words("english"))                  
 
-	# remove stop words
-	meaningful_words = [w for w in words if not w in stops]   
+	# remove stop words, keep only meaningful terms with length > 2
+	words_with_meaning = [w for w in words if ((not w in stops) and (len(w)>2))]   
 
 	# concatenate words seperated by space
-	return( " ".join( meaningful_words )) 
+	return( " ".join( words_with_meaning )) 
 
 
 def main():

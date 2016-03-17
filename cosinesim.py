@@ -5,15 +5,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import pickle
+
 from sklearn import feature_extraction
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import KMeans
 from sklearn.manifold import MDS
-from scipy.cluster.hierarchy import ward, dendrogram
+from scipy.cluster.hierarchy import ward, dendrogram, linkage
+from sklearn.metrics.pairwise import cosine_similarity,linear_kernel
 from sklearn.decomposition import PCA
 
-# kmeans, mds and hierarchical clustering implementation taken on 14/03/2016 and adjusted
+# kmeans, mds and hierarchical clustering implementation taken on 14/02/2016 and adjusted
 # http://brandonrose.org/clustering#Visualizing-document-clusters 
 
 sourceDir = './matrices/tfidf_matrix.txt'
@@ -58,7 +59,7 @@ def mds(dist, clusters, titles):
 	#create data frame that has the result of the MDS plus the cluster numbers and titles
 	df = pd.DataFrame(dict(x=xs, y=ys, label=clusters, title=titles)) 
 
-	#group by cluster
+	# group by cluster
 	groups = df.groupby('label')
 
 	# set up plot
@@ -85,20 +86,21 @@ def mds(dist, clusters, titles):
 	        top='off',         # ticks along the top edge are off
 	        labelleft='off')
 	    
-	ax.legend(numpoints=1)  #show legend with only 1 point
+	ax.legend(numpoints=1, loc=2)  #show legend with only 1 point
 
 	#add label in x,y position with the label as the film title
 	for i in range(len(df)):
 	    ax.text(df.ix[i]['x'], df.ix[i]['y'], df.ix[i]['title'], size=8)  
     
     # Show the plot
-	# plt.show()
-	plt.savefig('./figures/mds.png', dpi=200)
+	plt.show()
+	# plt.savefig('./figures/mds.png', dpi=200)
 	plt.close()
 
 def hierarchical_clustering(dist, titles):
 
-	linkage_matrix = ward(dist) #define the linkage_matrix using ward clustering pre-computed distances
+	# linkage_matrix = ward(dist) #define the linkage_matrix using ward clustering pre-computed distances
+	linkage_matrix = linkage(dist, 'weighted') 
 
 	fig, ax = plt.subplots(figsize=(15, 20)) # set size
 	ax = dendrogram(linkage_matrix, orientation="right", labels=titles);
@@ -112,8 +114,8 @@ def hierarchical_clustering(dist, titles):
 
 	# Show plot with tight layout
 	plt.tight_layout()
-	# plt.show()
-	plt.savefig('./figures/hierarchical.png', dpi=200)
+	plt.show()
+	# plt.savefig('./figures/hierarchical.png', dpi=200)
 	plt.close()
 
 def main():
@@ -126,6 +128,7 @@ def main():
 	with open(featureNamesFile, 'rb') as handle3:
 		featureNames = pickle.load(handle3)
 
+	print("Tf_Idf matrix dimensions")
 	print(tfidf_matrix.shape)
 
 
@@ -134,13 +137,15 @@ def main():
 	tfidf_matrix2 = pca.transform(tfidf_matrix.toarray())
 
 	# Make a List of 24 lists with 24 elements each describing the cosine distance of each document to another
-	cosDist = cosineSimilarity(tfidf_matrix2)
+	# cosDist = cosineSimilarity(tfidf_matrix2)
+	cosDist = cosineSimilarity(tfidf_matrix)
+
 
 	# Return a list which describes in which cluster each document belongs
+	# clusters = kmeans(tfidf_matrix2)
 	clusters = kmeans(tfidf_matrix)
 	books = { 'title': titles, 'cluster': clusters}
 	frame = pd.DataFrame(books, index = [clusters] , columns = ['title', 'cluster'])
-
 
 	# For cosine similarity distance matrix
 	# Apply hierarchical clustering 
